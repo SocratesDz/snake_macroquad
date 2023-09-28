@@ -1,8 +1,8 @@
-use std::collections::LinkedList;
+use std::{collections::LinkedList, ops::Mul};
 
 use macroquad::{miniquad::window::quit, prelude::*};
 
-pub mod Theme {
+pub mod theme {
     use macroquad::prelude::Color;
 
     /**
@@ -20,45 +20,77 @@ pub mod Theme {
 
 const TILE_SIZE: f32 = 8.0;
 
-struct Snake {
-    head: Vec2,
-    body: LinkedList<Vec2>,
+struct Dot {
+    position: Vec2,
     direction: Vec2,
+}
+
+impl Dot {
+    fn draw(&self) {
+        draw_rectangle(self.position.x, self.position.y, TILE_SIZE, TILE_SIZE, theme::FG2)
+    }
+}
+
+struct Snake {
+    head: Dot,
+    body: LinkedList<Dot>,
     speed: f32,
 }
 
 impl Snake {
     fn new(x: f32, y: f32) -> Snake {
         Snake {
-            head: Vec2::new(x, y),
+            head: Dot {
+                position: Vec2::new(x, y),
+                direction: Vec2::new(-1.0, 0.0)
+            },
             body: LinkedList::new(),
-            direction: Vec2::new(-1.0, 0.0),
             speed: 1.0
         }
     }
 
     fn draw(&self) {
-        draw_rectangle(self.head.x, self.head.y, TILE_SIZE, TILE_SIZE, Theme::FG2)
+        self.head.draw();
+        for dot in self.body.iter() {
+            dot.draw()
+        }
     }
 
     fn update(&mut self, dt: f32) {
-        if self.direction.x == 0.0 {
+        // Update head
+        if self.head.direction.x == 0.0 {
             if is_key_pressed(KeyCode::A) {
-                self.direction = Vec2::new(-1.0, 0.0)
+                self.head.direction = Vec2::new(-1.0, 0.0)
             }
             if is_key_pressed(KeyCode::D) {
-                self.direction = Vec2::new(1.0, 0.0)
+                self.head.direction = Vec2::new(1.0, 0.0)
             }
         }
-        if self.direction.y == 0.0 {
+        if self.head.direction.y == 0.0 {
             if is_key_pressed(KeyCode::W) {
-                self.direction = Vec2::new(0.0, -1.0)
+                self.head.direction = Vec2::new(0.0, -1.0)
             }
             if is_key_pressed(KeyCode::S) {
-                self.direction = Vec2::new(0.0, 1.0)
+                self.head.direction = Vec2::new(0.0, 1.0)
             }
         }
-        self.head += dt * self.speed * self.direction * TILE_SIZE;  
+        self.head.position += dt * self.speed * self.head.direction * TILE_SIZE;
+
+        // Update body segments
+        for segment in self.body.iter_mut() {
+            segment.position += dt * self.speed * segment.direction * TILE_SIZE;
+        }
+    }
+
+    fn grow(&mut self) {
+        let last_dot = self.body.back().unwrap_or(&self.head);
+        
+        self.body.push_back(
+            Dot { 
+                position: last_dot.position + last_dot.direction.mul(TILE_SIZE).mul(-1.0), 
+                direction: last_dot.direction 
+            }
+        )
     }
 }
 
@@ -71,7 +103,7 @@ fn draw_grid(x: f32, y: f32, width: f32, height: f32) {
             let y = y + (j as f32) * TILE_SIZE;
             let w = TILE_SIZE;
             let h = TILE_SIZE;
-            draw_rectangle_lines(x, y, w, h, 2.0, Theme::BG1)
+            draw_rectangle_lines(x, y, w, h, 2.0, theme::BG1)
         }
     }
 }
@@ -85,7 +117,7 @@ async fn main() {
 
         snake.update(delta);
 
-        clear_background(Theme::BG1);
+        clear_background(theme::BG1);
 
         draw_grid(
             TILE_SIZE,
@@ -95,6 +127,10 @@ async fn main() {
         );
 
         snake.draw();
+
+        if is_key_pressed(KeyCode::G) {
+            snake.grow()
+        }
 
         if is_key_released(KeyCode::Escape) {
             quit()
