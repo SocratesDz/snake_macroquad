@@ -1,5 +1,3 @@
-use std::{collections::LinkedList, ops::Mul};
-
 use macroquad::{miniquad::window::quit, prelude::*};
 
 pub mod theme {
@@ -20,6 +18,7 @@ pub mod theme {
 
 const TILE_SIZE: f32 = 8.0;
 
+#[derive(Clone, Copy)]
 struct Dot {
     position: Vec2,
     direction: Vec2,
@@ -33,7 +32,7 @@ impl Dot {
 
 struct Snake {
     head: Dot,
-    body: LinkedList<Dot>,
+    body: Vec<Dot>,
     speed: f32,
 }
 
@@ -44,8 +43,8 @@ impl Snake {
                 position: Vec2::new(x, y),
                 direction: Vec2::new(-1.0, 0.0)
             },
-            body: LinkedList::new(),
-            speed: 1.0
+            body: vec!(),
+            speed: 1.0,
         }
     }
 
@@ -76,35 +75,33 @@ impl Snake {
         }
         self.head.position += dt * self.speed * self.head.direction * TILE_SIZE;
 
+
+        // Change first body direction so it matches head.direction
+        // Every node should change direction to the previous one.
+
         // Update body segments
-        for segment in self.body.iter_mut() {
+        let mut previous_elem = Some(self.head.clone());
+        for segment in &mut self.body {
+            if let Some(previous) = previous_elem {
+                let ghost_position = previous.position + (TILE_SIZE * previous.direction * -1.);
+                if segment.direction != previous.direction && ghost_position.as_ivec2() == segment.position.as_ivec2() {
+                    segment.direction = previous.direction;
+                }
+            }
             segment.position += dt * self.speed * segment.direction * TILE_SIZE;
+            previous_elem = Some(segment.clone());
         }
     }
 
     fn grow(&mut self) {
-        let last_dot = self.body.back().unwrap_or(&self.head);
+        let last_dot = self.body.last().unwrap_or(&self.head);
         
-        self.body.push_back(
+        self.body.push(
             Dot { 
-                position: last_dot.position + last_dot.direction.mul(TILE_SIZE).mul(-1.0), 
+                position: last_dot.position + last_dot.direction * TILE_SIZE * -1., 
                 direction: last_dot.direction 
             }
         )
-    }
-}
-
-fn draw_grid(x: f32, y: f32, width: f32, height: f32) {
-    let tile_width_ammount = (width - x) / TILE_SIZE;
-    let tile_height_ammount = (height - y) / TILE_SIZE;
-    for i in 0..(tile_width_ammount as i32) {
-        for j in 0..(tile_height_ammount as i32) {
-            let x = x + (i as f32) * TILE_SIZE;
-            let y = y + (j as f32) * TILE_SIZE;
-            let w = TILE_SIZE;
-            let h = TILE_SIZE;
-            draw_rectangle_lines(x, y, w, h, 2.0, theme::BG1)
-        }
     }
 }
 
@@ -118,13 +115,6 @@ async fn main() {
         snake.update(delta);
 
         clear_background(theme::BG1);
-
-        draw_grid(
-            TILE_SIZE,
-            TILE_SIZE,
-            screen_width() - TILE_SIZE,
-            screen_height() - TILE_SIZE,
-        );
 
         snake.draw();
 
