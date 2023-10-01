@@ -1,3 +1,5 @@
+use std::ops::{Add, Rem};
+
 use macroquad::prelude::*;
 
 use crate::{
@@ -66,6 +68,15 @@ impl Snake {
             self.last_update = get_time();
             self.body.insert(0, self.head);
             self.head.grid_position += self.head.direction;
+
+            // Warp
+            self.head.grid_position = self
+                .head
+                .grid_position
+                .add(ivec2(board.width, board.height))
+                .rem(ivec2(board.width, board.height));
+
+            // Check collisions
             if let Some(cell) = board.get_cell(self.head.grid_position) {
                 match cell.cell_type {
                     CellType::Food => {

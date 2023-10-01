@@ -74,8 +74,6 @@ impl App {
             self.snake.render();
         }
 
-        self.board.draw_debug_lines();
-
         self.render_buffer()
     }
 

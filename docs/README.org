@@ -15,13 +15,17 @@ I have to pick one:
 *** Ty - Shades of Nokia 4
 
 bg1: #c7f0d8 rgb(199, 240, 216) 
+
 fg1: #778d90 rgb(119,141,144) 
+
 bg2: #43523d rgb(67,82,61) 
+
 fg2: #312b25 rgb(49,43,37) 
 
 *** Casio Basic
 
 Black: #000000 rgb(0, 0, 0) (foreground) 
+
 Light Green: #83b07e rgb(131,176,126) (blackground) 
 
 ** States
@@ -40,7 +44,24 @@ Light Green: #83b07e rgb(131,176,126) (blackground)
 
 ** Current work
 
- *** DONE Setup camera
- *** DONE Debug grid lines
- *** DONE Fix food position
- *** TODO Add warp system
+*** DONE Setup camera
+
+*** DONE Debug grid lines
+
+*** DONE Fix food position
+
+*** DONE Add warp system
+
+*** TODO Add score system
+
+*** TODO Fix: Don't allow food items spawn in cells with snake body
+
+*** TODO Speed should increase in a constant rate
+
+*** TODO Fix Game Over screen positioning
+
+*** TODO Save highscore (in memory)
+
+*** TODO Add sound effects
+
+*** TODO Add game over animations
