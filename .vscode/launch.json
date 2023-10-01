@@ -10,7 +10,7 @@
             "name": "Debug executable 'snake'",
             "cargo": {
                 "args": [
-                    "build",
+                    "run",
                     "--bin=snake",
                     "--package=snake"
                 ],
