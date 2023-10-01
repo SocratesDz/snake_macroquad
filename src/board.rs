@@ -41,16 +41,30 @@ impl Board {
         });
     }
 
-    pub fn insert(&mut self, position: Vec2, cell: Cell) {
-        self.cells
-            .insert((position.x as i32, position.y as i32), cell);
+    pub fn insert(&mut self, position: IVec2, cell: Cell) {
+        self.cells.insert((position.x, position.y), cell);
     }
 
     pub fn has_food(&self) -> bool {
         self.cells.values().any(|c| c.cell_type == CellType::Food)
     }
 
-    pub fn get_cell(&self, position: Vec2) -> Option<&Cell> {
-        self.cells.get(&(position.x as i32, position.y as i32))
+    pub fn get_cell(&self, position: IVec2) -> Option<&Cell> {
+        self.cells.get(&(position.x, position.y))
+    }
+
+    pub fn draw_debug_lines(&self) {
+        for i in 0..self.width {
+            for j in 0..self.height {
+                draw_rectangle_lines(
+                    (i as f32) * TILE_SIZE,
+                    (j as f32) * TILE_SIZE,
+                    TILE_SIZE,
+                    TILE_SIZE,
+                    1.,
+                    GREEN,
+                )
+            }
+        }
     }
 }

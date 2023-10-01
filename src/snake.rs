@@ -19,9 +19,9 @@ impl Snake {
     pub fn new() -> Self {
         Self {
             head: Cell {
-                position: Vec2::new(1., 1.),
+                grid_position: ivec2(2, 2),
                 cell_type: CellType::SnakeBody,
-                direction: Vec2::new(-1., 0.),
+                direction: ivec2(-1, 0),
             },
             body: vec![],
             speed: 1.0,
@@ -34,23 +34,23 @@ impl Snake {
     pub fn update(&mut self, _dt: f32, board: &mut Board) {
         // Player controller
         if !self.navigation_lock {
-            if self.head.direction.x == 0. {
+            if self.head.direction.x == 0 {
                 if is_key_pressed(KeyCode::A) {
-                    self.head.direction = Vec2::new(-1., 0.);
+                    self.head.direction = ivec2(-1, 0);
                     self.navigation_lock = true;
                 }
                 if is_key_pressed(KeyCode::D) {
-                    self.head.direction = Vec2::new(1., 0.);
+                    self.head.direction = ivec2(1, 0);
                     self.navigation_lock = true;
                 }
             }
-            if self.head.direction.y == 0. {
+            if self.head.direction.y == 0 {
                 if is_key_pressed(KeyCode::W) {
-                    self.head.direction = Vec2::new(0., -1.);
+                    self.head.direction = ivec2(0, -1);
                     self.navigation_lock = true;
                 }
                 if is_key_pressed(KeyCode::S) {
-                    self.head.direction = Vec2::new(0., 1.);
+                    self.head.direction = ivec2(0, 1);
                     self.navigation_lock = true;
                 }
             }
@@ -65,12 +65,12 @@ impl Snake {
             }
             self.last_update = get_time();
             self.body.insert(0, self.head);
-            self.head.position += self.head.direction;
-            if let Some(cell) = board.get_cell(self.head.position) {
+            self.head.grid_position += self.head.direction;
+            if let Some(cell) = board.get_cell(self.head.grid_position) {
                 match cell.cell_type {
                     CellType::Food => {
                         self.grow();
-                        clear_cell(self.head.position, board);
+                        clear_cell(self.head.grid_position, board);
                         self.speed *= 0.9
                     }
                     CellType::Wall => {
@@ -82,7 +82,7 @@ impl Snake {
             self.body.pop();
 
             for c in &self.body {
-                if self.head.position == c.position {
+                if self.head.grid_position == c.grid_position {
                     self.is_hit = true;
                 }
             }

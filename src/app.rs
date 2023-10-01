@@ -1,9 +1,11 @@
+use std::ops::Div;
+
 use macroquad::{miniquad::window::quit, prelude::*};
 
 use crate::{
     board::Board,
     cell::{Cell, CellType},
-    constants::{VIRTUAL_HEIGHT, VIRTUAL_WIDTH},
+    constants::{TILE_SIZE, VIRTUAL_HEIGHT, VIRTUAL_WIDTH},
     snake::Snake,
     theme,
     utils::get_render_scale,
@@ -27,7 +29,10 @@ impl App {
         camera.render_target = Some(render_target.clone());
 
         Self {
-            board: Board::new((100, 100)),
+            board: Board::new((
+                VIRTUAL_WIDTH.div(TILE_SIZE) as i32,
+                VIRTUAL_HEIGHT.div(TILE_SIZE) as i32,
+            )),
             snake: Snake::new(),
             game_over: false,
             camera,
@@ -69,6 +74,12 @@ impl App {
             self.snake.render();
         }
 
+        self.board.draw_debug_lines();
+
+        self.render_buffer()
+    }
+
+    pub fn render_buffer(&self) {
         set_default_camera();
 
         clear_background(BLACK);
@@ -88,27 +99,28 @@ impl App {
     }
 
     pub fn reset(&mut self) {
-        self.board = Board::new((100, 100));
+        self.board = Board::new((
+            VIRTUAL_WIDTH.div(TILE_SIZE) as i32,
+            VIRTUAL_HEIGHT.div(TILE_SIZE) as i32,
+        ));
         self.snake = Snake::new();
         self.game_over = false;
     }
 }
 
 pub fn generate_food(board: &mut Board) {
-    let position = Vec2::new(
-        rand::gen_range(0., board.width as f32),
-        rand::gen_range(0., board.height as f32),
+    let position = ivec2(
+        rand::gen_range::<i32>(0, board.width),
+        rand::gen_range::<i32>(0, board.height),
     );
     let cell = Cell {
-        position,
+        grid_position: position,
         cell_type: CellType::Food,
-        direction: Vec2::ZERO,
+        direction: IVec2::ZERO,
     };
     board.insert(position, cell);
 }
 
-pub fn clear_cell(position: Vec2, board: &mut Board) {
-    board
-        .cells
-        .remove_entry(&(position.x as i32, position.y as i32));
+pub fn clear_cell(position: IVec2, board: &mut Board) {
+    board.cells.remove_entry(&(position.x, position.y));
 }

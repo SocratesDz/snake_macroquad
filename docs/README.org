@@ -40,5 +40,7 @@ Light Green: #83b07e rgb(131,176,126) (blackground)
 
 ** Current work
 
- - Setup camera
- - Debug grid lines
+ *** DONE Setup camera
+ *** DONE Debug grid lines
+ *** DONE Fix food position
+ *** TODO Add warp system
