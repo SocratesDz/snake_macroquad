@@ -2,6 +2,10 @@ use std::ops::{Add, Rem};
 
 use macroquad::prelude::*;
 
+const INITIAL_SPEED: f32 = 1.;
+const MAX_SPEED: f32 = 10.;
+const SPEED_INCREASE: f32 = 1.5;
+
 use crate::{
     app::{clear_cell, generate_food},
     board::Board,
@@ -26,7 +30,7 @@ impl Snake {
                 direction: ivec2(-1, 0),
             },
             body: vec![],
-            speed: 1.0,
+            speed: 1./INITIAL_SPEED,
             last_update: get_time(),
             is_hit: false,
             navigation_lock: false,
@@ -82,7 +86,11 @@ impl Snake {
                     CellType::Food => {
                         self.grow();
                         clear_cell(self.head.grid_position, board);
-                        self.speed *= 0.9
+                        self.speed = clamp(
+                            self.speed * (1. / SPEED_INCREASE),
+                            1. / MAX_SPEED,
+                            1. / INITIAL_SPEED,
+                        );
                     }
                     CellType::Wall => {
                         self.is_hit = true;
