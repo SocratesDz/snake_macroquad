@@ -62,13 +62,15 @@ impl App {
         clear_background(theme::BG1);
 
         if self.game_over {
+            let game_over_str = "GAME OVER";
+
             draw_text(
-                "GAME OVER",
-                screen_width() / 2.,
-                screen_height() / 2.,
-                12.,
+                game_over_str,
+                (VIRTUAL_WIDTH / 2.) - (game_over_str.len()*16/4) as f32,
+                VIRTUAL_HEIGHT / 2.,
+                16.,
                 theme::FG2,
-            )
+            );
         } else {
             self.board.render();
             self.snake.render();

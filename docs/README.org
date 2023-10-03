@@ -58,7 +58,7 @@ Light Green: #83b07e rgb(131,176,126) (blackground)
 
 *** DONE Speed should increase in a constant rate
 
-*** TODO Fix Game Over screen positioning
+*** DONE Fix Game Over screen positioning
 
 *** TODO Save highscore (in memory)
 
