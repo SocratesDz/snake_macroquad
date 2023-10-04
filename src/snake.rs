@@ -22,10 +22,10 @@ pub struct Snake {
 }
 
 impl Snake {
-    pub fn new() -> Self {
+    pub fn new(x: i32, y: i32) -> Self {
         Self {
             head: Cell {
-                grid_position: ivec2(2, 2),
+                grid_position: ivec2(x, y),
                 cell_type: CellType::SnakeBody,
                 direction: ivec2(-1, 0),
             },
@@ -62,16 +62,20 @@ impl Snake {
             }
         }
 
+        if !board.has_food() {
+            generate_food(board, self)
+        }
+
         // Update movement
         if get_time() - self.last_update > self.speed as f64 {
             self.navigation_lock = false;
 
-            if !board.has_food() {
-                generate_food(board)
-            }
             self.last_update = get_time();
             self.body.insert(0, self.head);
             self.head.grid_position += self.head.direction;
+
+            // Should the snake cell be inserted in the board?
+            // board.insert(self.head.grid_position, self.head);
 
             // Warp
             self.head.grid_position = self
@@ -100,6 +104,7 @@ impl Snake {
             }
             self.body.pop();
 
+            // Check if snake hit itself
             for c in &self.body {
                 if self.head.grid_position == c.grid_position {
                     self.is_hit = true;

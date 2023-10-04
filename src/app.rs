@@ -27,13 +27,16 @@ impl App {
         let mut camera =
             Camera2D::from_display_rect(Rect::new(0., 0., VIRTUAL_WIDTH, VIRTUAL_HEIGHT));
         camera.render_target = Some(render_target.clone());
-
-        Self {
-            board: Board::new((
+        
+        let (width, height) = (
                 VIRTUAL_WIDTH.div(TILE_SIZE) as i32,
                 VIRTUAL_HEIGHT.div(TILE_SIZE) as i32,
-            )),
-            snake: Snake::new(),
+            );
+        let board = Board::new((width, height));
+
+        Self {
+            board: board,
+            snake: Snake::new(width/2, height/2),
             game_over: false,
             camera,
             render_target,
@@ -103,16 +106,24 @@ impl App {
             VIRTUAL_WIDTH.div(TILE_SIZE) as i32,
             VIRTUAL_HEIGHT.div(TILE_SIZE) as i32,
         ));
-        self.snake = Snake::new();
+        self.snake = Snake::new(self.board.width/2, self.board.height/2);
         self.game_over = false;
     }
 }
 
-pub fn generate_food(board: &mut Board) {
-    let position = ivec2(
+pub fn generate_food(board: &mut Board, snake: &Snake) {
+    
+    let mut position = ivec2(
         rand::gen_range::<i32>(0, board.width),
         rand::gen_range::<i32>(0, board.height),
     );
+    // FIXME: Infinite loop if the user is too good
+    while snake.body.iter().any(|c| c.grid_position == position) {
+        position = ivec2(
+                rand::gen_range::<i32>(0, board.width),
+                rand::gen_range::<i32>(0, board.height),
+            );
+    }
     let cell = Cell {
         grid_position: position,
         cell_type: CellType::Food,
