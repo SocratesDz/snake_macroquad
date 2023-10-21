@@ -19,9 +19,16 @@ impl Snake {
     }
 
     pub fn update(&mut self) {
+        self.body.insert(0, self.head);
         self.head.update();
-        for cell in &mut self.body {
-            cell.update();
-        }
+        self.body.pop();
+    }
+
+    pub fn grow(&mut self) {
+        self.body.push(self.head)
+    }
+
+    pub fn change_direction(&mut self, direction: (i32, i32)) {
+        self.head.direction = direction;
     }
 }

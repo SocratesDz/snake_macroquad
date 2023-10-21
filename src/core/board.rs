@@ -1,3 +1,5 @@
+use macroquad::rand;
+
 use super::cell::Cell;
 use super::snake::Snake;
 
@@ -30,5 +32,22 @@ impl Board {
 
     pub fn update(&mut self) {
         self.snake.update()
+    }
+
+    pub fn generate_food(&mut self) {
+        if self.snake.body.len() >= (self.rows*self.columns) as usize {
+            return;
+        }
+        let position = (
+            rand::gen_range::<i32>(0, self.rows as i32),
+            rand::gen_range::<i32>(0, self.columns as i32)
+        );
+        let cell = Cell {
+            x: position.0,
+            y: position.1,
+            cell_type: super::cell::CellType::Food,
+            direction: (0, 0)
+        };
+        self.cells.insert((position.0 + (self.rows as i32) * position.1) as usize, cell)
     }
 }

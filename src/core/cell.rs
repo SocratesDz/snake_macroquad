@@ -1,14 +1,21 @@
+use super::constants::Direction;
+
+#[derive(Clone, Copy)]
 pub struct Cell {
     pub x: i32,
     pub y: i32,
     pub cell_type: CellType,
-    pub direction: (i32, i32),
+    pub direction: Direction,
 }
 
 impl Cell {
     pub fn update(&mut self) {
         self.x += self.direction.0;
         self.y += self.direction.1;
+    }
+
+    pub fn position(&self) -> (i32, i32) {
+        (self.x, self.y)
     }
 }
 
@@ -23,6 +30,7 @@ impl Default for Cell {
     }
 }
 
+#[derive(Clone, Copy)]
 pub enum CellType {
     Wall,
     SnakeBody,
