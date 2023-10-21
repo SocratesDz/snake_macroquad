@@ -65,3 +65,5 @@ Light Green: #83b07e rgb(131,176,126) (blackground)
 *** TODO Add sound effects
 
 *** TODO Add game over animations
+
+*** TODO Use the board grid as a backend for the game
