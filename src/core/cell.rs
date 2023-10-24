@@ -30,7 +30,7 @@ impl Default for Cell {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum CellType {
     Wall,
     SnakeBody,

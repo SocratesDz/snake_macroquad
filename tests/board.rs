@@ -1,4 +1,4 @@
-use snake::core::{board::Board, constants::{LEFT, UP}};
+use snake::core::{board::Board, constants::{LEFT, UP}, cell::CellType};
 
 #[test]
 fn test_update_board() {
@@ -50,6 +50,8 @@ fn test_change_snake_direction() {
 #[test]
 fn test_food_generation() {
     let mut board = Board::new(10, 10);
+    
+    let _ = board.place_food((0, 0));
 
-    board.generate_food();
+    assert!(board.cells.get(0).unwrap().cell_type == CellType::Food)
 }
