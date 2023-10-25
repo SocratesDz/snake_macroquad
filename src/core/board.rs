@@ -7,7 +7,7 @@ use super::snake::Snake;
 
 pub enum FoodError {
     NoEmptyCells,
-    UsedCell
+    UsedCell,
 }
 
 pub struct Board {
@@ -20,11 +20,11 @@ pub struct Board {
 impl Board {
     pub fn new(rows: u32, columns: u32) -> Self {
         let mut cells = vec![];
-        for r in 0..rows {
-            for c in 0..columns {
+        for row in 0..rows {
+            for col in 0..columns {
                 cells.push(Cell {
-                    x: r as i32,
-                    y: c as i32,
+                    x: row as i32,
+                    y: col as i32,
                     ..Default::default()
                 })
             }
@@ -33,7 +33,7 @@ impl Board {
             rows,
             columns,
             cells,
-            snake: Snake::new((rows/2) as i32, (columns/2) as i32),
+            snake: Snake::new((rows / 2) as i32, (columns / 2) as i32),
         }
     }
 
@@ -45,31 +45,44 @@ impl Board {
 
     pub fn place_food(&mut self, position: (u32, u32)) -> Result<(), FoodError> {
         if self.snake.body.len() + 1 == (self.rows * self.columns) as usize {
-            return Err(FoodError::NoEmptyCells)
+            return Err(FoodError::NoEmptyCells);
         }
-        if self.snake.body.iter().chain(once(&self.snake.head)).any(|c| (c.x as u32, c.y as u32) == position) {
-            return Err(FoodError::UsedCell)
+        if self
+            .snake
+            .body
+            .iter()
+            .chain(once(&self.snake.head))
+            .any(|c| (c.x as u32, c.y as u32) == position)
+        {
+            return Err(FoodError::UsedCell);
         }
         let cell = Cell {
-            x: position.0 as i32, 
-            y: position.1 as i32, 
+            x: position.0 as i32,
+            y: position.1 as i32,
             cell_type: super::cell::CellType::Food,
-            direction: (0, 0)
+            direction: (0, 0),
         };
-        self.cells.insert((position.0 + (self.rows) * position.1) as usize, cell);
+        self.cells
+            .insert(self.position_to_index(position.0, position.1), cell);
         Ok(())
     }
 
     pub fn generate_random_food(&mut self) {
         let position = (
             rand::gen_range::<u32>(0, self.rows),
-            rand::gen_range::<u32>(0, self.columns)
+            rand::gen_range::<u32>(0, self.columns),
         );
         match self.place_food(position) {
-            Err(FoodError::UsedCell) => {
-                self.generate_random_food()
-            },
+            Err(FoodError::UsedCell) => self.generate_random_food(),
             _ => {}
         }
+    }
+
+    pub fn get_cell(&self, x: u32, y: u32) -> Option<&Cell> {
+        self.cells.get(self.position_to_index(x, y))
+    }
+
+    fn position_to_index(&self, x: u32, y: u32) -> usize {
+        ((x * self.columns) + y) as usize
     }
 }
