@@ -1,4 +1,4 @@
-use super::{cell::{Cell, CellType}, constants::LEFT, };
+use super::{cell::{Cell, CellType}, constants::LEFT, board::Board, };
 
 pub struct Snake {
     pub head: Cell,
