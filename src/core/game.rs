@@ -21,6 +21,7 @@ impl Game {
 
     pub fn update(&mut self) {
         self.snake.update();
+
         // Check for snake collision
         if let Some((index, cell)) = self
             .snake
